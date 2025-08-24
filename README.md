@@ -26,6 +26,23 @@ A comprehensive household management application built with Next.js 15, TypeScri
 - Node.js 18+ 
 - npm or yarn
 
+## Environment Setup
+
+### Required Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```bash
+# Household Profiler API Configuration
+PROFILER_BASE_URL=http://localhost:3000
+# PROFILER_API_KEY=  # Optional: Add if your Profiler API requires authentication
+```
+
+**Important Notes:**
+- **Port Configuration**: Household Hub runs on port 3001, Profiler API on port 3000
+- **Cross-Machine Setup**: If running Hub and Profiler on different machines, replace `localhost` with the actual IP address or hostname
+- **Server-Side Fetching**: All Profiler API calls are made server-side to avoid CORS issues
+
 ## Installation
 
 1. Clone the repository:
@@ -74,6 +91,20 @@ The application uses:
 - **Tailwind CSS** for responsive design
 - **shadcn/ui** components for consistent UI
 - **App Router** for modern Next.js routing
+
+### Data Caching Strategy
+
+The Household Hub uses Next.js built-in fetch caching for optimal performance:
+
+- **List Endpoints** (Household, Members): 60-second cache with `revalidate: 60`
+- **Detail Endpoints** (Individual Member): 30-second cache with `revalidate: 30`
+- **Cache Tags**: All Profiler data uses the `profiler-data` tag for easy invalidation
+- **Server-Side Rendering**: All API calls are made server-side for better performance and SEO
+
+This approach provides:
+- **Fresh Data**: Regular updates without manual refresh
+- **Performance**: Reduced API calls and faster page loads
+- **Stability**: Graceful fallbacks when the Profiler API is unavailable
 
 ## Contributing
 
