@@ -16,8 +16,8 @@ interface Member {
   weight?: string;
   activityLevel?: string;
   goals?: string[];
-  allergens?: string[];
-  exclusions?: string[];
+  allergens?: string | string[]; // Can be JSON string or array
+  exclusions?: string | string[]; // Can be JSON string or array
   likes?: string[];
   dislikes?: string[];
   medicalNotes?: string;
