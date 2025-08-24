@@ -1,9 +1,10 @@
 import Layout from '@/components/layout/layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getMember } from '@/lib/profiler';
+import { getMember, formatAge, formatHeight, formatHeightWeight } from '@/lib/profiler';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 
 interface MemberDetailPageProps {
   params: Promise<{
@@ -24,19 +25,6 @@ const MemberDetailPage = async ({ params }: MemberDetailPageProps) => {
   }
 
   const member = memberResult.data!;
-
-  // Helper function to format age or DOB
-  const formatAgeOrDOB = () => {
-    if (member.age) {
-      return `${member.age} years old`;
-    }
-    if (member.dateOfBirth) {
-      const dob = new Date(member.dateOfBirth);
-      const age = Math.floor((Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-      return `${age} years old (born ${dob.toLocaleDateString()})`;
-    }
-    return 'Age not specified';
-  };
 
   // Helper function to format lists
   const formatList = (items: string[] | undefined, emptyMessage: string) => {
@@ -59,30 +47,62 @@ const MemberDetailPage = async ({ params }: MemberDetailPageProps) => {
 
   return (
     <Layout>
-      <div className="space-y-6">
-        {/* Header with back button */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{member.name}</h1>
-            <p className="text-gray-600 mt-2">Member profile and details</p>
+              <div className="space-y-6">
+          {/* Header with back button */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">{member.name}</h1>
+              <p className="text-gray-600 mt-2">Member profile and details</p>
+            </div>
+            <Link href="/members">
+              <Button variant="outline">
+                ← Back to Members
+              </Button>
+            </Link>
           </div>
-          <Link href="/members">
-            <Button variant="outline">
-              ← Back to Members
-            </Button>
-          </Link>
-        </div>
 
-        {/* Basic Information Card */}
+          {/* Debug Info - Remove this after fixing */}
+          <Card className="bg-yellow-50 border-yellow-200">
+            <CardHeader>
+              <CardTitle className="text-lg text-yellow-800">Debug Info (Remove After Fix)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-sm text-yellow-700 space-y-2">
+                <div><strong>Goals type:</strong> {typeof member.goals} - {Array.isArray(member.goals) ? 'Array' : 'Not Array'}</div>
+                <div><strong>Allergens type:</strong> {typeof member.allergens} - {Array.isArray(member.allergens) ? 'Array' : 'Not Array'}</div>
+                <div><strong>Exclusions type:</strong> {typeof member.exclusions} - {Array.isArray(member.exclusions) ? 'Array' : 'Not Array'}</div>
+                <div><strong>Likes type:</strong> {typeof member.likes} - {Array.isArray(member.likes) ? 'Array' : 'Not Array'}</div>
+                <div><strong>Dislikes type:</strong> {typeof member.dislikes} - {Array.isArray(member.dislikes) ? 'Array' : 'Not Array'}</div>
+                <div><strong>Goals value:</strong> {JSON.stringify(member.goals)}</div>
+                <div><strong>Allergens value:</strong> {JSON.stringify(member.allergens)}</div>
+              </div>
+            </CardContent>
+          </Card>
+
+        {/* Member Photo and Basic Info */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">Basic Information</CardTitle>
+            <CardTitle className="text-xl">Profile</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Photo */}
+            {member.photo && (
+              <div className="flex justify-center">
+                <Image
+                  src={member.photo}
+                  alt={`${member.name}'s photo`}
+                  width={200}
+                  height={200}
+                  className="rounded-lg object-cover"
+                  unoptimized={true}
+                />
+              </div>
+            )}
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {renderInfoSection(
                 'Age',
-                formatAgeOrDOB(),
+                formatAge(member.dateOfBirth, member.age),
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -98,7 +118,7 @@ const MemberDetailPage = async ({ params }: MemberDetailPageProps) => {
               
               {renderInfoSection(
                 'Height',
-                member.height,
+                member.height ? formatHeight(member.height) : undefined,
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                 </svg>
@@ -106,7 +126,7 @@ const MemberDetailPage = async ({ params }: MemberDetailPageProps) => {
               
               {renderInfoSection(
                 'Weight',
-                member.weight,
+                member.weight ? `${member.weight} lbs.` : undefined,
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l1-6m-1 6l-6-2m6 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V9a2 2 0 012-2h8a2 2 0 012 2z" />
                 </svg>
@@ -124,7 +144,7 @@ const MemberDetailPage = async ({ params }: MemberDetailPageProps) => {
         </Card>
 
         {/* Goals Card */}
-        {member.goals && member.goals.length > 0 && (
+        {Array.isArray(member.goals) && member.goals.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle className="text-xl">Goals</CardTitle>
@@ -145,14 +165,14 @@ const MemberDetailPage = async ({ params }: MemberDetailPageProps) => {
         )}
 
         {/* Dietary Information Card */}
-        {(member.allergens && member.allergens.length > 0) || 
-         (member.exclusions && member.exclusions.length > 0) ? (
+        {(Array.isArray(member.allergens) && member.allergens.length > 0) || 
+         (Array.isArray(member.exclusions) && member.exclusions.length > 0) ? (
           <Card>
             <CardHeader>
               <CardTitle className="text-xl">Dietary Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {member.allergens && member.allergens.length > 0 && (
+              {Array.isArray(member.allergens) && member.allergens.length > 0 && (
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Allergens</h4>
                   <div className="flex flex-wrap gap-2">
@@ -168,7 +188,7 @@ const MemberDetailPage = async ({ params }: MemberDetailPageProps) => {
                 </div>
               )}
               
-              {member.exclusions && member.exclusions.length > 0 && (
+              {Array.isArray(member.exclusions) && member.exclusions.length > 0 && (
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Exclusions</h4>
                   <div className="flex flex-wrap gap-2">
@@ -197,14 +217,14 @@ const MemberDetailPage = async ({ params }: MemberDetailPageProps) => {
         )}
 
         {/* Preferences Card */}
-        {(member.likes && member.likes.length > 0) || 
-         (member.dislikes && member.dislikes.length > 0) ? (
+        {(Array.isArray(member.likes) && member.likes.length > 0) || 
+         (Array.isArray(member.dislikes) && member.dislikes.length > 0) ? (
           <Card>
             <CardHeader>
               <CardTitle className="text-xl">Preferences</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {member.likes && member.likes.length > 0 && (
+              {Array.isArray(member.likes) && member.likes.length > 0 && (
                 <div>
                   <h4 className="font-medium text-gray-900 mb-2">Likes</h4>
                   <div className="flex flex-wrap gap-2">
@@ -220,9 +240,9 @@ const MemberDetailPage = async ({ params }: MemberDetailPageProps) => {
                 </div>
               )}
               
-              {member.dislikes && member.dislikes.length > 0 && (
+              {Array.isArray(member.dislikes) && member.dislikes.length > 0 && (
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Dislikes</h4>
+                  <h4 className="font-medium text-gray-800 mb-2">Dislikes</h4>
                   <div className="flex flex-wrap gap-2">
                     {member.dislikes.map((dislike, index) => (
                       <span
