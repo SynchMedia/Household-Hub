@@ -33,15 +33,15 @@ A comprehensive household management application built with Next.js 15, TypeScri
 Create a `.env.local` file in the root directory with the following variables:
 
 ```bash
-# Household Profiler API Configuration
+# Household [Profiler](https://github.com/SynchMedia/household-profiler) API Configuration
 PROFILER_BASE_URL=http://localhost:3000
-# PROFILER_API_KEY=  # Optional: Add if your Profiler API requires authentication
+# PROFILER_API_KEY=  # Optional: Add if your [Profiler](https://github.com/SynchMedia/household-profiler) API requires authentication
 ```
 
 **Important Notes:**
-- **Port Configuration**: Household Hub runs on port 3001, Profiler API on port 3000
-- **Cross-Machine Setup**: If running Hub and Profiler on different machines, replace `localhost` with the actual IP address or hostname
-- **Server-Side Fetching**: All Profiler API calls are made server-side to avoid CORS issues
+- **Port Configuration**: Household Hub runs on port 3001, [Profiler](https://github.com/SynchMedia/household-profiler) API on port 3000
+- **Cross-Machine Setup**: If running Hub and [Profiler](https://github.com/SynchMedia/household-profiler) on different machines, replace `localhost` with the actual IP address or hostname
+- **Server-Side Fetching**: All [Profiler](https://github.com/SynchMedia/household-profiler) API calls are made server-side to avoid CORS issues
 
 ## Installation
 
@@ -98,13 +98,13 @@ The Household Hub uses Next.js built-in fetch caching for optimal performance:
 
 - **List Endpoints** (Household, Members): 60-second cache with `revalidate: 60`
 - **Detail Endpoints** (Individual Member): 30-second cache with `revalidate: 30`
-- **Cache Tags**: All Profiler data uses the `profiler-data` tag for easy invalidation
+- **Cache Tags**: All [Profiler](https://github.com/SynchMedia/household-profiler) data uses the `profiler-data` tag for easy invalidation
 - **Server-Side Rendering**: All API calls are made server-side for better performance and SEO
 
 This approach provides:
 - **Fresh Data**: Regular updates without manual refresh
 - **Performance**: Reduced API calls and faster page loads
-- **Stability**: Graceful fallbacks when the Profiler API is unavailable
+- **Stability**: Graceful fallbacks when the [Profiler](https://github.com/SynchMedia/household-profiler) API is unavailable
 
 ## Contributing
 
